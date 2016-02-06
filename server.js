@@ -1,8 +1,9 @@
 var express = require("express");
-var app = express();
 var bodyParser = require("body-parser");
 var middleware = require("./middleware.js");
+var _ = require("underscore");
 
+var app = express();
 const PORT = process.env.PORT || 3000;
 var todos = [];
 var todoNextId = 1;
@@ -23,15 +24,7 @@ app.get("/todos", function(req, res) {
 // GET /todos
 app.get("/todos/:id", function(req, res) {
 	var todoId = parseInt(req.params.id,10);
-	var matchedTodo;
-	
-	// search all the todos for the todo with the id chosen.
-	todos.forEach(function (todo) {
-		console.log("id: " + todo.id + " "+todoId);
-		if (todo.id === todoId) {
-			matchedTodo = todo;
-		}
-	});
+	var matchedTodo = _.findWhere(todos, {id: todoId});
 	
 	// In case todo with the id is not found
 	if(matchedTodo) {
@@ -44,36 +37,25 @@ app.get("/todos/:id", function(req, res) {
 //POST /todos request : send a json object to server
 app.post("/todos", function(req, res) {
 	var body = req.body;
+	if(!_.isBoolean(body.completed) 
+		|| !_.isString(body.description) 
+		|| body.description.trim().length === 0) {
+			
+		return res.status(400).send();
+	} else {
+		body = _.pick(body, "description", "completed");
+		body.id = todoNextId;
+		body.description = body.description.trim();
+		todoNextId += 1;
 	
-	body.id = todoNextId;
-	todoNextId += 1;
+		todos.push(body);
 	
-	console.log("Description" + body.description);
-	todos.push(body);
+		res.json(body);
+	}
 	
-	res.json(body);
 });
 
 
 app.listen(PORT, function() {
 	console.log("Express listening on port " + PORT +"!");
 })
-
-
-// var todos = [{
-// 	id: 1,
-// 	description: "Meet mom for lunch",
-// 	completed: false
-// }, {
-// 	id: 5,
-// 	description: "Go to market",
-// 	completed: false
-// }, {
-// 	id: 3,
-// 	description: "Purchase fruits",
-// 	completed: true
-// }, {
-// 	id: 4,
-// 	description: "IOS App submission",
-// 	completed: false
-// }];
