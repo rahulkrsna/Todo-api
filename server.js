@@ -1,31 +1,19 @@
 var express = require("express");
 var app = express();
-const PORT = process.env.PORT || 3000;
+var bodyParser = require("body-parser");
 var middleware = require("./middleware.js");
-var todos = [{
-	id: 1,
-	description: "Meet mom for lunch",
-	completed: false
-}, {
-	id: 5,
-	description: "Go to market",
-	completed: false
-}, {
-	id: 3,
-	description: "Purchase fruits",
-	completed: true
-}, {
-	id: 4,
-	description: "IOS App submission",
-	completed: false
-}];
 
+const PORT = process.env.PORT || 3000;
+var todos = [];
+var todoNextId = 1;
 
 app.use(middleware.logger);
+app.use(bodyParser.json()); //anytime json information is received, it is parsed.
 
 app.get("/", function(req, res) {
 	res.send('ToDo API Root');
 });
+
 
 // GET /todos
 app.get("/todos", function(req, res) {
@@ -53,7 +41,39 @@ app.get("/todos/:id", function(req, res) {
 	}
 });
 
+//POST /todos request : send a json object to server
+app.post("/todos", function(req, res) {
+	var body = req.body;
+	
+	body.id = todoNextId;
+	todoNextId += 1;
+	
+	console.log("Description" + body.description);
+	todos.push(body);
+	
+	res.json(body);
+});
+
 
 app.listen(PORT, function() {
 	console.log("Express listening on port " + PORT +"!");
 })
+
+
+// var todos = [{
+// 	id: 1,
+// 	description: "Meet mom for lunch",
+// 	completed: false
+// }, {
+// 	id: 5,
+// 	description: "Go to market",
+// 	completed: false
+// }, {
+// 	id: 3,
+// 	description: "Purchase fruits",
+// 	completed: true
+// }, {
+// 	id: 4,
+// 	description: "IOS App submission",
+// 	completed: false
+// }];
