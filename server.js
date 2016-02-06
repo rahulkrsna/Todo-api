@@ -7,13 +7,17 @@ var todos = [{
 	description: "Meet mom for lunch",
 	completed: false
 }, {
-	id: 2,
+	id: 5,
 	description: "Go to market",
 	completed: false
 }, {
 	id: 3,
 	description: "Purchase fruits",
 	completed: true
+}, {
+	id: 4,
+	description: "IOS App submission",
+	completed: false
 }];
 
 
