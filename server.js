@@ -6,7 +6,7 @@ var middleware = require("./middleware.js");
 app.use(middleware.logger);
 
 app.get("/", function(req, res) {
-	res.send('ToDo API Root');
+	res.send('ToDo API Root'+PORT);
 });
 
 app.listen(PORT, function() {
