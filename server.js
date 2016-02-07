@@ -16,10 +16,10 @@ app.get("/", function(req, res) {
 });
 
 
-// GET /todos
+// GET /todos?completed=false&q=work
 app.get("/todos", function(req, res) {
 	var queryParams = req.query; // an object that stores the request params
-	var filteredTodos;
+	var filteredTodos = todos;
 	
 	// Filter the output based on the query params.
 	if(queryParams.hasOwnProperty("completed")) {
@@ -30,14 +30,19 @@ app.get("/todos", function(req, res) {
 		} else {
 			return res.status(404).send("No Item found for the query");
 		}
-		// Return the filtered items.
-		res.json(filteredTodos);
-	} else {
-		res.json(todos); // This converts the array to json and send
 	}
+	if(queryParams.hasOwnProperty("q") && queryParams.q.trim().length > 0) {
+		filteredTodos = _.filter(filteredTodos, function(todo) {
+			return todo.description.toLowerCase().indexOf(queryParams.q.toLowerCase()) > -1;
+		});
+	}
+	
+	return res.json(filteredTodos)
+	// res.json(todos); // This converts the array to json and send
+	
 });
 
-// GET /todos
+// GET /todos/1
 app.get("/todos/:id", function(req, res) {
 	var todoId = parseInt(req.params.id,10);
 	var matchedTodo = _.findWhere(todos, {id: todoId});
