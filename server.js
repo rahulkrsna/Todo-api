@@ -20,35 +20,41 @@ app.get("/", function(req, res) {
 app.get("/todos", function(req, res) {
 	var queryParams = req.query; // an object that stores the request params
 	var filteredTodos = todos;
-	
+
 	// Filter the output based on the query params.
-	if(queryParams.hasOwnProperty("completed")) {
-		if(queryParams.completed === "true") {
-			filteredTodos = _.where(todos, {completed: true});
+	if (queryParams.hasOwnProperty("completed")) {
+		if (queryParams.completed === "true") {
+			filteredTodos = _.where(todos, {
+				completed: true
+			});
 		} else if (queryParams.completed === "false") {
-			filteredTodos = _.where(todos, {completed: false});
+			filteredTodos = _.where(todos, {
+				completed: false
+			});
 		} else {
 			return res.status(404).send("No Item found for the query");
 		}
 	}
-	if(queryParams.hasOwnProperty("q") && queryParams.q.trim().length > 0) {
+	if (queryParams.hasOwnProperty("q") && queryParams.q.trim().length > 0) {
 		filteredTodos = _.filter(filteredTodos, function(todo) {
 			return todo.description.toLowerCase().indexOf(queryParams.q.toLowerCase()) > -1;
 		});
 	}
-	
+
 	return res.json(filteredTodos)
 	// res.json(todos); // This converts the array to json and send
-	
+
 });
 
 // GET /todos/1
 app.get("/todos/:id", function(req, res) {
-	var todoId = parseInt(req.params.id,10);
-	var matchedTodo = _.findWhere(todos, {id: todoId});
-	
+	var todoId = parseInt(req.params.id, 10);
+	var matchedTodo = _.findWhere(todos, {
+		id: todoId
+	});
+
 	// In case todo with the id is not found
-	if(matchedTodo) {
+	if (matchedTodo) {
 		res.json(matchedTodo);
 	} else {
 		res.status(404).send("Item not found");
@@ -58,10 +64,8 @@ app.get("/todos/:id", function(req, res) {
 //POST /todos request : send a json object to server
 app.post("/todos", function(req, res) {
 	var body = req.body;
-	if(!_.isBoolean(body.completed) 
-		|| !_.isString(body.description) 
-		|| body.description.trim().length === 0) {
-			
+	if (!_.isBoolean(body.completed) || !_.isString(body.description) || body.description.trim().length === 0) {
+
 		return res.status(400).send();
 	} else {
 		body = _.pick(body, "description", "completed");
@@ -76,10 +80,12 @@ app.post("/todos", function(req, res) {
 //DELETE /todos/:id
 app.delete("/todos/:id", function(req, res) {
 	var todoId = parseInt(req.params.id, 10);
-	var matchedTodo = _.findWhere(todos, {id: todoId});
-	
-	if(matchedTodo) {
-		todos = _.without(todos,matchedTodo);
+	var matchedTodo = _.findWhere(todos, {
+		id: todoId
+	});
+
+	if (matchedTodo) {
+		todos = _.without(todos, matchedTodo);
 		res.send("Item " + matchedTodo.description + " is deleted!");
 	} else {
 		res.status(404).send("Item not found");
@@ -87,27 +93,29 @@ app.delete("/todos/:id", function(req, res) {
 });
 
 // PUT /todos/:id
-app.put("/todos/:id", function (req, res) {
+app.put("/todos/:id", function(req, res) {
 	var todoId = parseInt(req.params.id, 10);
-	var matchedTodo = _.findWhere(todos, {id: todoId})
+	var matchedTodo = _.findWhere(todos, {
+		id: todoId
+	})
 	var body = _.pick(req.body, "description", "completed");
 	var validAttributes = {};
-	
-	if(!matchedTodo) {
+
+	if (!matchedTodo) {
 		return res.status(404).send("Item not found");
 	}
-	
+
 	if (body.hasOwnProperty("completed")) {
-		if(_.isBoolean(body.completed)) {
+		if (_.isBoolean(body.completed)) {
 			validAttributes.completed = body.completed;
 		} else {
 			console.log("Not boolean");
 			return res.status(400).send();
 		}
 	}
-	if(body.hasOwnProperty("description")) {
-		if(_.isString(body.description) && body.description.trim().length > 0) {
-			validAttributes.description = body.description;	
+	if (body.hasOwnProperty("description")) {
+		if (_.isString(body.description) && body.description.trim().length > 0) {
+			validAttributes.description = body.description;
 		} else {
 			console.log("Description not in format");
 			return res.status(400).send();
@@ -116,12 +124,12 @@ app.put("/todos/:id", function (req, res) {
 	console.log("Updates: " + validAttributes);
 	// updated the attribute values in matchedTodo with that of validAttributes
 	console.log(matchedTodo);
-	_.extend(matchedTodo,validAttributes);
+	_.extend(matchedTodo, validAttributes);
 	console.log(matchedTodo);
 	res.json(matchedTodo);
-	 
+
 });
 
 app.listen(PORT, function() {
-	console.log("Express listening on port " + PORT +"!");
+	console.log("Express listening on port " + PORT + "!");
 })
