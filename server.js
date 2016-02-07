@@ -18,7 +18,23 @@ app.get("/", function(req, res) {
 
 // GET /todos
 app.get("/todos", function(req, res) {
-	res.json(todos); // This converts the array to json and send
+	var queryParams = req.query; // an object that stores the request params
+	var filteredTodos;
+	
+	// Filter the output based on the query params.
+	if(queryParams.hasOwnProperty("completed")) {
+		if(queryParams.completed === "true") {
+			filteredTodos = _.where(todos, {completed: true});
+		} else if (queryParams.completed === "false") {
+			filteredTodos = _.where(todos, {completed: false});
+		} else {
+			return res.status(404).send("No Item found for the query");
+		}
+		// Return the filtered items.
+		res.json(filteredTodos);
+	} else {
+		res.json(todos); // This converts the array to json and send
+	}
 });
 
 // GET /todos
@@ -47,9 +63,7 @@ app.post("/todos", function(req, res) {
 		body.id = todoNextId;
 		body.description = body.description.trim();
 		todoNextId += 1;
-	
 		todos.push(body);
-	
 		res.json(body);
 	}
 });
